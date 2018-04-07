@@ -1,30 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>mapDemo</title>
-    <!-- 导入地图样式 -->
-    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
-</head>
-<body>
-<!-- 选定地图的div容器 -->
-<div id="container"></div>
-<!-- 异步加载 JavaScript API。-->
-<script src="http://webapi.amap.com/maps?v=1.3&key=503101c0fbfdf07ab343e45e8c5c8c5d&callback=init"></script>
-<script>
-    function init(){
-        // 创建地图对象
-        var map = new AMap.Map('container', {
-            center: [116.397428, 39.90923],
-            zoom: 11
-        });
-        map.plugin(["AMap.ToolBar"], function() {
-            // 添加 工具条
-            map.addControl(new AMap.ToolBar());
-        });
-    }
-</script>
-</body>
+<html>
+  <head>
+      <title>demo</title>
+    <!-- This stylesheet contains specific styles for displaying the map
+         on this page. Replace it with your own styles as described in the
+         documentation:
+         https://developers.google.com/maps/documentation/javascript/tutorial -->
+    <link href="../node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .vz-menu-toggle{
+            text-decoration: none;
+            color:#02b3e4;
+            font-size:25px;
+        }
+        .vz-aside-title{
+            padding-left:30px;
+            font-size:18px; 
+        }
+        .vz-filter-button{
+            padding:5px 10px;
+            background-color: #02b3e4;
+            border: solid 1px #27b6dd;
+            color:#fff;
+        }
+        .vz-filter-button:active{
+            box-shadow:inset -5px -5px 5px #fff;
+        }
+        .vz-filter-text{
+            padding:5px 10px;
+        }
+    </style>
+  </head>
+  <body>
+    <section class="vz-container vz-container-full">
+        <aside class="vz-aside vz-container vz-container-vertical">
+            <h3 class="vz-aside-title">
+                测试系统
+            </h3>
+            <div class="vz-aside-controls vz-container">
+                <input class="vz-filter-text vz-flex-1" type="text" placeholder="station location">
+                <button class="vz-filter-button">
+                    <i class="fa fa-filter"></i>
+                    Filter
+                </button>
+            </div>
+        </aside>
+        <section class="vz-container vz-container-vertical vz-flex-1">
+            <header class="vz-header vz-container">
+                <a href="#" class="vz-menu-toggle">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </header>
+            <div id="map" class="vz-main vz-flex-1"></div>
+        </section>
+    </section>
+    
+
+    <script>
+        function initMap() {
+            // Create a map object and specify the DOM element for display.
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                zoom: 8
+            });
+        }
+
+    </script>
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyATbm4c2A3xGEPGTHcvqjDAryV__Q89v1M&callback=initMap">
+    </script>
+  </body>
 </html>

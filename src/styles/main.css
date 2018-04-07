@@ -1,0 +1,32 @@
+html,body {
+    margin: 0;
+    padding:0;
+    height:100%;
+}
+
+.vz-container{
+    display: flex; 
+}
+.vz-container.vz-container-full{
+    height:100%;
+}
+.vz-container.vz-container-vertical{
+    flex-direction: column;
+}
+.vz-flex-1{
+    flex:1;
+}
+
+
+.vz-aside{
+   width: 320px; 
+   background: #2e3d49;
+   color:#eee;
+}
+.vz-header{
+    /* height:60px; */
+    padding:15px 25px;
+    align-items: center;
+    background: #1c262f;
+    color:#fff;  
+}
