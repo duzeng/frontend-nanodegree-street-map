@@ -14,41 +14,91 @@
             color:#02b3e4;
             font-size:25px;
         }
+        .vz-menu-toggle:hover{
+            color:#0fa6cf;
+        }
+        .vz-menu-toggle:active{
+            color:#0c80a0;
+        }
+
+
         .vz-aside-title{
             padding-left:30px;
             font-size:18px; 
         }
         .vz-filter-button{
             padding:5px 10px;
-            background-color: #02b3e4;
-            border: solid 1px #27b6dd;
+            background-color: #02b3e4; 
+            border:none;
             color:#fff;
         }
-        .vz-filter-button:active{
-            box-shadow:inset -5px -5px 5px #fff;
+        .vz-filter-button:hover{
+            background-color: #0fa6cf;
+        }
+        .vz-filter-button:active{ 
+            background-color: #0c80a0; 
         }
         .vz-filter-text{
             padding:5px 10px;
+        }
+
+
+
+        .vz-aside-list{
+            margin: 0;
+            padding:10px 10px 0 20px;
+            list-style: none;
+        }
+        .vz-aside-list .vz-aside-list-item+.vz-aside-list-item{
+            margin-top:30px;
+        }
+        .vz-aside-list-item a{
+            text-decoration: none;
+            color:#eee;
+        }
+        .vz-aside.show{
+            display: flex;
+        }
+        .vz-aside.hide{
+            display: none;
+        }
+        @media (max-width: 575.99px) {
+            .vz-aside{
+                display: none !important;
+            }
+            .vz-aside.show{
+                display: flex !important;
+            }
+        }
+        @media (min-width: 576px) {
+            .vz-aside{
+                display: flex;
+            }
         }
     </style>
   </head>
   <body>
     <section class="vz-container vz-container-full">
-        <aside class="vz-aside vz-container vz-container-vertical">
-            <h3 class="vz-aside-title">
-                测试系统
+        <aside class="vz-aside vz-container vz-container-vertical" data-bind="css: {show:sideOpened, hide:!sideOpened()}">
+            <h3 class="vz-aside-title" data-bind="text: filterText"> 
+                 
             </h3>
             <div class="vz-aside-controls vz-container">
-                <input class="vz-filter-text vz-flex-1" type="text" placeholder="station location">
-                <button class="vz-filter-button">
+                <input class="vz-filter-text vz-flex-1" type="text" placeholder="station location" data-bind="textInput: filterText">
+                <button class="vz-filter-button" data-bind="click: filter">
                     <i class="fa fa-filter"></i>
                     Filter
                 </button>
             </div>
+            <ul class="vz-aside-list" data-bind="foreach: filteredLocations">
+                <li class="vz-aside-list-item">
+                    <a href="" data-bind="text: title"></a>
+                </li>  
+            </ul>
         </aside>
         <section class="vz-container vz-container-vertical vz-flex-1">
             <header class="vz-header vz-container">
-                <a href="#" class="vz-menu-toggle">
+                <a href="#" class="vz-menu-toggle" data-bind="click: toggleHandler">
                     <i class="fa fa-bars"></i>
                 </a>
             </header>
@@ -56,14 +106,91 @@
         </section>
     </section>
     
+    <script type="text/javascript" src="lib/knockout/knockout-3.4.2.js"></script>
+    <script src="js/AppViewModel.js"></script>
+    <script> 
+        let locations=[
+            {title: '12th St. Oakland city center', location: { lat:37.8036031,lng:-122.2723818}},
+            {title: '16th St. Mission', location: {lat: 37.7652056, lng: -122.4193183}},
+            {title: '19th St. Oakland', location: {lat: 37.8099686, lng: -122.2748055}},
+            {title: '24th St. Mission', location: {lat: 37.7523462, lng: -122.4190436}},
+            {title: 'Ashby', location: {lat: 37.8387687, lng: -122.211808}},
+            {title: 'Balboa Park', location: {lat: 37.7217266, lng: -122.445771}}
+        ]; 
 
-    <script>
+        ko.applyBindings(new AppViewModel({locations}));
+ 
+        var mapCenter={lat: 37.7411277794, lng: -122.4192810059};
+        //var mapCenter={ lat:37.8036031,lng:-122.2723818};
         function initMap() {
+            var markers=[];
+
             // Create a map object and specify the DOM element for display.
             var map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -34.397, lng: 150.644},
-                zoom: 8
+                center: mapCenter,
+                zoom: 11
             });
+
+
+            // Style the markers a bit. This will be our listing marker icon.
+            var defaultIcon = makeMarkerIcon('0091ff');
+            // Create a "highlighted location" marker color for when the user
+            // mouses over the marker.
+            var highlightedIcon = makeMarkerIcon('FFFF24');
+
+            locations.forEach((item,index)=>{
+                // Get the position from the location array.
+                // var position = locations[i].location;
+                // var title = locations[i].title;
+
+                const {location,title}=item;
+                // Create a marker per location, and put into markers array.
+                var marker = new google.maps.Marker({
+                    position: location,
+                    title: title,
+                    animation: google.maps.Animation.DROP,
+                    icon: defaultIcon,
+                    id: index
+                });
+                // Push the marker to our array of markers.
+                markers.push(marker);
+                // Create an onclick event to open the large infowindow at each marker.
+                marker.addListener('click', function() {
+                    populateInfoWindow(this, largeInfowindow);
+                });
+                // Two event listeners - one for mouseover, one for mouseout,
+                // to change the colors back and forth.
+                marker.addListener('mouseover', function() {
+                    this.setIcon(highlightedIcon);
+                });
+                marker.addListener('mouseout', function() {
+                    this.setIcon(defaultIcon);
+                });
+
+
+                var bounds = new google.maps.LatLngBounds();
+                // Extend the boundaries of the map for each marker and display the marker
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(map);
+                    bounds.extend(markers[i].position);
+                }
+                map.fitBounds(bounds);
+            });
+        }
+
+
+        // This function takes in a COLOR, and then creates a new marker
+        // icon of that color. The icon will be 21 px wide by 34 high, have an origin
+        // of 0, 0 and be anchored at 10, 34).
+        function makeMarkerIcon(markerColor) {
+            var markerImage = new google.maps.MarkerImage(
+            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+            '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21,34));
+            return markerImage;
         }
 
     </script>
