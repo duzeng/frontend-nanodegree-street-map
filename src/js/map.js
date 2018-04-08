@@ -1,6 +1,8 @@
 ;var map=(function(locations){
     var mapCenter={lat: 37.7411277794, lng: -122.4192810059};
     //var mapCenter={ lat:37.8036031,lng:-122.2723818};
+
+    //array of markers
     var markers=[];
     var map;
 
@@ -61,7 +63,7 @@
     }
 
     /**
-     * refesh the locations on map
+     * refesh the locations on map after filtered
      * @param {*} locations 
      */
     var refresh=function(locations){  
@@ -71,6 +73,10 @@
         }));
     }
 
+    /**
+     * highlight marker on map after selected
+     * @param {*} location 
+     */
     var selected=function(location){ 
         markers.forEach(t=> defaultedMarker(t));
         const marker=markers.find(item=>item.id===location.id);
@@ -78,6 +84,11 @@
         populateInfoWindow(marker, largeInfowindow);
     }
 
+    /**
+     * open the large infowindow
+     * @param {*} marker 
+     * @param {*} infowindow 
+     */
     function populateInfoWindow(marker,infowindow){
         if (infowindow.marker===marker) return;
 
@@ -95,6 +106,10 @@
         
     }
 
+    /**
+     * use flickr api for searching address
+     * @param {*} marker 
+     */
     function searchByFlickr(marker){ 
         var extraContainer=document.getElementById('extra');
         var remoteUrlWithOrigin=new URL('https://api.flickr.com/services/rest'); 
@@ -126,6 +141,7 @@
             extraContainer.innerHTML=`<p>search failed! ${JSON.stringify(e)}</p>`;
         });  
     }
+
     // This function takes in a COLOR, and then creates a new marker
     // icon of that color. The icon will be 21 px wide by 34 high, have an origin
     // of 0, 0 and be anchored at 10, 34).
