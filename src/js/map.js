@@ -4,6 +4,7 @@
     var markers=[];
     var map;
 
+    var defaultIcon,selectedIcon,highlightedIcon;
     /**
      * map initial function
      */
@@ -15,11 +16,12 @@
         }); 
 
         // Style the markers a bit. This will be our listing marker icon.
-        var defaultIcon = makeMarkerIcon('0091ff');
+        defaultIcon = makeMarkerIcon('0091ff');
+        selectedIcon = makeMarkerIcon('FF0000');
         // Create a "highlighted location" marker color for when the user
         // mouses over the marker.
-        var highlightedIcon = makeMarkerIcon('FFFF24');
-
+        highlightedIcon = makeMarkerIcon('FFFF24');
+        
         locations.forEach( item => {
             // Get the position from the location array.
             // var position = locations[i].location;
@@ -42,11 +44,12 @@
             });
             // Two event listeners - one for mouseover, one for mouseout,
             // to change the colors back and forth.
-            marker.addListener('mouseover', function() {
-                this.setIcon(highlightedIcon);
+            marker.addListener('mouseover', function() {  
+                this.lastIcon=this.getIcon();
+                highlightMarker(this);
             });
-            marker.addListener('mouseout', function() {
-                this.setIcon(defaultIcon);
+            marker.addListener('mouseout', function() {  
+                setMarkerIcon(this,this.lastIcon);
             });
 
             
@@ -64,6 +67,11 @@
         showMarkers(markers.filter(item=> {
             return locations.findIndex(loc=>loc.id===item.id)>=0
         }));
+    }
+
+    var selected=function(location){ 
+        markers.forEach(t=> defaultedMarker(t));
+        selectedMarker(markers.find(item=>item.id===location.id))
     }
 
     // This function takes in a COLOR, and then creates a new marker
@@ -94,8 +102,27 @@
         map.fitBounds(bounds);
     }
 
+    /* ================================== */
+    /**
+     *  change marker's icon
+     */
+    var selectedMarker=function(marker){
+        setMarkerIcon(marker,selectedIcon);
+    }
+    var highlightMarker=function(marker){ 
+        setMarkerIcon(marker,highlightedIcon);
+    }
+    var defaultedMarker=function(marker){
+        setMarkerIcon(marker,defaultIcon);
+    }
+    var setMarkerIcon=function(marker,icon){ 
+        marker && marker.setIcon(icon);
+    }
+    /* ================================== */
+
     return {
         initMap,
-        refresh 
+        refresh,
+        selected 
     }
 })(locations);

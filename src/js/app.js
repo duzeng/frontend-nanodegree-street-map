@@ -1,7 +1,7 @@
 ;var app=(function(){
     class AppViewModel {
         constructor(props){
-            const { locations=[],afterFilteredCallback }=props; 
+            const { locations=[],afterFilteredCallback,selectedCallback }=props; 
 
             this.sideOpened=ko.observable(true);
             this.allLocations=ko.observableArray(locations);
@@ -16,15 +16,20 @@
 
                 
             this.afterFilteredCallback=afterFilteredCallback;
+            this.selectedCallback=selectedCallback;
         }
     
         toggleHandler(){
             this.sideOpened(!this.sideOpened());
         }
     
-        filter(){
+        filterHandler(){
             this.filterText(this.text());
             this.afterFilteredCallback && this.afterFilteredCallback(this.filteredLocations());
+        }
+
+        selectHandler(location){  
+            this.selectedCallback && this.selectedCallback(location);
         }
     } 
 
