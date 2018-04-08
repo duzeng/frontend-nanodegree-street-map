@@ -5,8 +5,9 @@
     var map;
 
     var defaultIcon,selectedIcon,highlightedIcon;
+    var largeInfowindow;
     /**
-     * map initial function
+     * map initial
      */
     var initMap=function() { 
         // Create a map object and specify the DOM element for display.
@@ -14,6 +15,8 @@
             center: mapCenter,
             zoom: 11
         }); 
+
+        largeInfowindow = new google.maps.InfoWindow();
 
         // Style the markers a bit. This will be our listing marker icon.
         defaultIcon = makeMarkerIcon('0091ff');
@@ -51,7 +54,6 @@
             marker.addListener('mouseout', function() {  
                 setMarkerIcon(this,this.lastIcon);
             });
-
             
         });
 
@@ -71,9 +73,59 @@
 
     var selected=function(location){ 
         markers.forEach(t=> defaultedMarker(t));
-        selectedMarker(markers.find(item=>item.id===location.id))
+        const marker=markers.find(item=>item.id===location.id);
+        selectedMarker(marker);
+        populateInfoWindow(marker, largeInfowindow);
     }
 
+    function populateInfoWindow(marker,infowindow){
+        if (infowindow.marker===marker) return;
+
+        infowindow.marker=marker;
+        infowindow.setContent(`<div>
+        <h3>${marker.title}</h3>
+        <div id="extra"></div>
+        </div>`);
+        
+        infowindow.addListener('closeclick',function(){
+            infowindow.setMarker(null);
+        });
+        infowindow.open(map,marker);
+        searchByFlickr(marker); 
+        
+    }
+
+    function searchByFlickr(marker){ 
+        var extraContainer=document.getElementById('extra');
+        var remoteUrlWithOrigin=new URL('https://api.flickr.com/services/rest'); 
+        var params={
+                'method':'flickr.places.findByLatLon',
+                'api_key':'dc96eac4784f4c3f7a051dd0363ca4a3',
+                'format':'json',
+                'nojsoncallback':1, 
+                lat:marker.position.lat(),
+                lon:marker.position.lng() 
+            };
+        Object.keys(params).forEach(key => remoteUrlWithOrigin.searchParams.append(key, params[key]))
+        fetch( remoteUrlWithOrigin, {
+            method: 'GET',   
+        }).then( function ( response ) {
+            if ( response.ok ) {
+                return response.json();
+            }
+            throw new Error( 'Network response was not ok: ' + response.statusText );
+        }).then( function ( data ) {
+            if (!data || data.stat!=='ok') {
+                extraContainer.innerHTML='<p>search failed!</p>'
+                return
+            }
+            const { places }=data;
+            const { place }=places;
+            extraContainer.innerHTML=`<p>${place[0].name}</p>`; 
+        }).catch(e=>{
+            extraContainer.innerHTML=`<p>search failed! ${JSON.stringify(e)}</p>`;
+        });  
+    }
     // This function takes in a COLOR, and then creates a new marker
     // icon of that color. The icon will be 21 px wide by 34 high, have an origin
     // of 0, 0 and be anchored at 10, 34).

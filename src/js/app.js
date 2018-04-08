@@ -1,4 +1,7 @@
 ;var app=(function(){
+    /**
+     * app's viewmodel class
+     */
     class AppViewModel {
         constructor(props){
             const { locations=[],afterFilteredCallback,selectedCallback }=props; 
@@ -20,6 +23,7 @@
         }
     
         toggleHandler(){
+            console.log(window.innerWidth)
             this.sideOpened(!this.sideOpened());
         }
     
