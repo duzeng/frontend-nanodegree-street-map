@@ -137,6 +137,7 @@
                 extraContainer.innerHTML='<p>search failed!</p>'
                 return
             }
+            console.log(data);
             const { places }=data;
             const { place }=places;
             extraContainer.innerHTML=`<p>${place[0].name}</p>`; 
