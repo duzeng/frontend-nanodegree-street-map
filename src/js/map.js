@@ -62,6 +62,9 @@
         showMarkers(markers);
     }
 
+    var mapErrorHandler=function(){
+        document.getElementById('map').innerHTML='<h2 style="position:absolute;left:50%;top:50%">Ooops!!! Map load failed!</h2>';
+    }
     /**
      * refesh the locations on map after filtered
      * @param {*} locations 
@@ -115,7 +118,7 @@
         var remoteUrlWithOrigin=new URL('https://api.flickr.com/services/rest'); 
         var params={
                 'method':'flickr.places.findByLatLon',
-                'api_key':'dc96eac4784f4c3f7a051dd0363ca4a3',
+                'api_key':'a966e8fbb1df127a49776df857312ce3',
                 'format':'json',
                 'nojsoncallback':1, 
                 lat:marker.position.lat(),
@@ -191,6 +194,7 @@
     return {
         initMap,
         refresh,
-        selected 
+        selected,
+        mapErrorHandler
     }
 })(locations);
