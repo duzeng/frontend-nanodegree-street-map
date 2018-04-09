@@ -16,7 +16,7 @@
             // compute the filtered locations
             this.filteredLocations=ko.computed(()=>{
                 return this.allLocations().filter(item=>{
-                    return item.title.toLowerCase().indexOf(this.filterText().toLowerCase())>=0
+                    return item.title.toLowerCase().includes(this.filterText().toLowerCase())
                 });
             });
 
